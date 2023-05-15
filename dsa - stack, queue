@@ -1,0 +1,54 @@
+1. Stack: 
+    stack<int> s;
+- s.push(x); //đưa phần tử x vào ngăn xếp
+- s.top(); //lấy giá trị top của ngăn xếp
+- s.pop(); //xóa phần tử cuối được chưa vào ngăn xếp
+- s.empty(); //kiểm tra ngăn xếp có rỗng hay không
+- s.size(); //kích thước hàng đợi
+
+// Có 2 cách cài đặt
+    1. Mảng
+       - Thời gian chạy: Trung bình mất O(1) cho push, pop. Xấu nhất là O(N).
+       - Bộ nhớ: Mảng sử dụng 25% -> 100% -> O(N).
+    2. Danh sách liên kết: Sử dụng con trỏ first quản lí phần tử đầu tiên
+       - push(x): tạo phần tử mới liên kết với dslk, đưa con trỏ first trỏ vào x.
+       - pop(): lấy ra giá trị của phần tử đầu tiên v = first.item, lưu trữ oldfirst = first, chuyển con trỏ first đến phần tử tiếp theo.
+       - Thời gian chạy: Xấu nhất O(1)
+       - Bộ nhớ: Cần lưu 1 con trỏ cho mỗi phần tử, thêm 4N (32 bit) hoặc 8N (64 bit).
+2. Queue: 
+    queue<int> q;
+- q.push(x); //đẩy x vào hàng đợi
+- q.front(); //lấy ra giá trị đầu hàng đợi.
+- q.back(); //lấy ra giá trị cuối hàng đợi
+- q.pop(); //lấy phần tử đầu tiên ra khỏi hàng đợi
+- q..empty(); //kiểm tra rỗng
+- q.size(); //kích thước hàng đợi
+
+// Có 2 cách cài đặt:
+    1. Mảng: quản lí phần tử đầu và cuối bằng 2 chỉ số head và tail, do trong mảng có nhiều ô trống nên head và tail chạy vòng tròn (quay về không khi chạm đến capacity).
+    2. Danh sách liên kết: Sử dụng 2 con trỏ first và last để quản lí phần tử đầu tiên và cuối cùng:
+       - dequeue(): giống pop của stack tại con trỏ first.
+       - enqueue(e): tạo ra phần tử mới, cho last.next trỏ đến e, chuyển con trỏ last đến phần tử mới.
+       - Thời gian chạy: Xấu nhất O(1).
+       - Bộ nhớ: Cần thêm con trỏ cho mỗi phần tử.
+3. Priority Queue:
+    priority_queue<int> pq;
+- pq.push(x); //đưa x vào hàng đợi
+- pq.top(); //truy cập vào giá trị của phần tử đầu hàng đợi ưu tiên (giá trị nhỏ nhất)
+- pq.pop(); //xóa phần tử ở đầu hàng đợi ưu tiên (giá trị nhỏ nhất)
+- pq.empty();
+- pq.size();
+
+// Có 3 cách cài đặt:
+    1. Mảng không thứ tự: 
+       - insert(x): giống push của stack(dùng mảng) -> mất O(1).
+       - peakMin(): duyệt mảng tìm phần tử nhỏ nhất -> mất O(N).
+       - deleteMin(): duyệt mảng tìm phần tử nhỏ nhất, tráo đổi phần tử nhỏ nhất với phần tử cuối cùng -> mất O(N).
+    2. Mảng sắp xếp giảm dần:
+       - insert(x): chèn x sao cho không mất sự giảm dần -> mất O(N)
+       - peakMin(): lấy ra phần tử cuối cùng -> O(1).
+       - deleteMin(): lấy ra phần tử cuối cùng và giảm kích thước mảng -> O(1).
+    3. Cấu trúc heap:
+       - insert(x): số bước bằng độ cao của cây O(logN)
+       - peakMin(): O(1)
+       - deleteMin(): số bước bằng độ cao của cây O(logN).
