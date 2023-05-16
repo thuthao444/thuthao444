@@ -1,0 +1,105 @@
+1. Sắp xếp chọn (Selection Sort) - không ổn định:
+   - ý tưởng: duyệt mảng, tại mỗi vị trí, tìm phần tử nhỏ nhất từ vị trí đó đến cuối mảng và tráo đổi.
+   - bất biến:
+      + các vị trí bên trái i đã được sắp xếp.
+      + các vị trí bên phải i không nhỏ hơn các vị trí bên trái i.
+   - Đánh giá:
+      + Thời gian chạy:
+         -> Số phép so sánh: O(N^2).
+         -> Số lần tráo đổi: O(N).
+      + Bộ nhớ: Cần thêm O(1).
+   - Cài đặt:
+   template <typename T>
+   void selection_sort(T &array) {
+       for (auto i = 0; i < array.size(); ++i) {
+           auto min = i;
+           for (auto j = i + 1; j < array.size(); ++j) {
+               if (array[j] < array[min])
+                   min = j;
+           }
+           swap(array[i], array[min]);
+       }
+   }
+   - VD: 3 1 8 5 2
+      1. i = 0:
+         min = 0;
+         1 <= j < 5: min = 1;
+         swap(a[0], a[1]) : 1 3 8 5 2
+      2. i = 1:
+         min = 1;
+         2 <= j < 5: min = 4
+         swap(a[1], a[4]) : 1 2 8 5 3
+      3. i = 2:
+         min = 2;
+         3 <= j < 5: min = 4
+         swap(a[2], a[4]) : 1 2 3 5 8
+      4. i = 3:
+         min = 3;
+         4 <= j < 5: min = 3
+         swap(a[3], a[3]) : 1 2 3 5 8
+      5. i = 4:
+         min = 4:
+         5 <= j < 5: min = 4
+         swap(a[4], a[4]) : 1 2 3 5 8
+2. Sắp xếp chèn (Insertion Sort) - Ổn định:
+   - ý tưởng: duyệt mảng, khi gặp một phần tử chưa được duyệt ta tìm vị trí thích hợp trong bộ phận mảng đã duyệt và chèn vào đó
+   (đẩy các phần tử lớn hơn sang 1 vị trí).
+   - bất biến:
+      + các vị trí 0, 1,..., i - 1 đã được duyệt và sắp xếp.
+      + các vị trí i,..., N - 1 chưa được duyệt.
+   - đánh giá: 
+      + Thời gian chạy: tổng số phép so sánh và tráo đổi là O(N^2).
+      + Bộ nhớ: Cần thêm O(1).
+   - cài đặt:
+   template <typename T>
+   void insertion_sort(T &array) {
+       for (auto i = 1; i < array.size(); ++i) {
+           auto j = i;
+           while (j > 0 && array[j] < array[j - 1]) {
+               swap(array[j], array[j - 1]);
+               j--;
+           }
+       }
+   }
+   - VD: 2 8 5 1 3
+   1. i = 1:
+      j = 1;
+      while {
+          array[1] > array[0]: không tráo đổi, j = 0 - kết thúc.
+      }
+      2 8 5 1 3
+    2. i = 2:
+       j = 2;
+       while {
+          array[2] < array[1]: swap(array[2], array[1]), j = 1: 2 5 8 1 3
+          array[1] > array[0]: không tráo đổi, j = 0 - kết thúc.
+      }
+      2 5 8 1 3
+    3. i = 3:
+       j = 3;
+       while {
+           array[3] < array[2]: swap, j = 2: 2 5 1 8 3
+           array[2] < array[1]: swap, j = 1: 2 1 5 8 3
+           array[1] < array[0]: swap, j = 0 - kết thúc: 1 2 5 8 3
+       }
+    4. i = 4:
+       j = 4;
+       while {
+           array[4] < array[3]: swap, j = 3: 1 2 5 3 8
+           array[3] < array[2]: swap, j = 2: 1 2 3 5 8
+       } các phần tử sau không nhỏ hơn nên kết thúc vòng lặp
+       1 2 3 5 8
+3. Sell Sort - không ổn định:
+   - Ý tưởng: giảm số bước chèn bằng cách dùng sắp xếp chèn các vị trí cách nhau h đơn vị với h giảm dần (h = 1, 4, 13, 40...).
+   - Đánh giá:
+      + Thời gian chạy: O(N^3/2).
+      + Bộ nhớ: Cần thêm O(1).
+4. Bucket Sort - không ổn định:
+   - ý tưởng: chia mảng vào các "sọt" tương ứng với giá trị, mỗi sọt chứa 1 khoảng giá trị nhất định, sắp xếp từng "sọt" rồi ghép kết quả lại
+5. Radix Sort - không ổn định:
+   - đánh giá:
+      + thời gian chạy: O(wN) với w là số chữ số.
+      + bộ nhớ: cần thêm O(N) cho các sọt.
+       
+   
+   
