@@ -1,0 +1,6 @@
+1. Sắp xếp trộn (Merge Sort) - Ổn định:
+   - ý tưởng: 
+      + chia mảng thành 2 nửa 
+      + sắp xếp 2 nửa riêng biệt 
+      + trộn 2 nửa đã được sắp xếp lại thành mảng sắp xếp
+   - Thủ tục trộn 
