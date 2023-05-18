@@ -3,4 +3,6 @@
       + chia mảng thành 2 nửa 
       + sắp xếp 2 nửa riêng biệt 
       + trộn 2 nửa đã được sắp xếp lại thành mảng sắp xếp
-   - Thủ tục trộn 
+   - Thủ tục trộn:
+      + Sử dụng mảng phụ
+      + Sử dụng hai con trỏ sao chép phần tử nhỏ hơn vào mảng phụ
