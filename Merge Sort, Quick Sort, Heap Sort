@@ -109,3 +109,10 @@
        shuffle(a);
        quick_sort(a, 0, a.size() - 1);
    }
+3. Heap Sort - không ổn định:
+   - Ý tưởng:
+      + Cấu trúc hàng đợi ưu tiên cho phép lấy ra phần tử lớn nhất
+      + Tráo đổi phần tử cuối mảng lên thay cho phần tử lớn nhất rồi cho chìm xuống
+   - Đánh giá:
+      + Bước xây dựng cấu trúc heap: O(N)
+      + Bước sắp xếp: O(NlogN)
