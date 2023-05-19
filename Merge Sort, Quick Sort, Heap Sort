@@ -6,3 +6,46 @@
    - Thủ tục trộn:
       + Sử dụng mảng phụ
       + Sử dụng hai con trỏ sao chép phần tử nhỏ hơn vào mảng phụ
+   - Đánh giá:
+      + Thời gian chạy: O(NlogN)
+      + Bộ nhớ: Cần O(N) cho mảng phụ
+   - Đánh giá sự tối ưu của MS:
+      + Trường hợp xấu nhất: O(NlogN)
+      + Tối ưu về phép so sánh nhưng không tối ưu về bộ nhớ
+   - Cài đặt:
+   template <typename T>
+   void merge(T &array, T &aux, unsigned int lo, unsigned int mid, unsigned int hi) {
+       auto i = lo;
+       auto j = mid + 1;
+       for (auto k = lo; k <= hi; k++) {
+           aux[k] = array[k];
+       }
+       for (auto k = lo; k <= hi; k++) {
+           if (i > mid) {
+               array[k] = aux[j++];
+           } else if (j > hi) {
+               array[k] = aux[i++];
+           } else if (aux[j] < aux[i]) {
+               array[k] = aux[j++];
+           } else {
+               array[k] = aux[i++]
+           }
+       }
+   }
+   
+   template <typename T>
+   void merge_sort(T &array, T &aux, unsigned int lo, unsigned int hi) {
+       if (hi <= lo) {
+           return;
+       }
+       auto mid = lo + (hi - lo) / 2;
+       merge_sort(array, aux, lo, mid);
+       merge_sort(array, aux, mid + 1, hi);
+       merge(array, aux, lo, mid, hi);
+   }
+   
+   template <typename T>
+   void merge_sort(T &array) {
+       T aux(array.size());
+       merge_sort(array, aux, 0, array.size() - 1);
+   }
