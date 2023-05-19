@@ -49,3 +49,63 @@
        T aux(array.size());
        merge_sort(array, aux, 0, array.size() - 1);
    }
+2. Quick Sort - Không ổn định:
+   - Ý tưởng:
+      + Với một giá trị v trong mảng, cố gắng chia mảng thành 2 phần: phần bên trái v không lớn hơn v và phần bên phải v không nhỏ hơn v
+      + Sắp xếp riêng biệt từng phần, các phần tử của 2 phần không cần chuyển sang phần còn lại nên mảng sẽ được sắp xếp
+   - Thủ tục phân chia:
+      + Đưa v về đầu mảng
+      + Sủ dụng 2 con trỏ i = lo và j = hi + 1
+      + Sử dụng con trỏ i duyệt từ trái qua phải cho đến khi gặp a[i] >= v
+      + Sử dụng con trỏ j duyệt từ phải qua trái cho đến khi gặp a[j] <= v
+         -> swap(a[i], a[j])
+      + i >= j: swap(a[lo], a[j])
+   - Chú ý:
+      + Có thể khiến partition ổn định nếu dùng mảng phụ
+      + Cần tráo đổi a một cách ngẫu nhiên để v nằm trong khoảng giữa mảng
+   - Đánh giá:
+      + Thời gian chạy: Tốt nhất O(NlogN), xấu nhất O(N^2) xảy ra khi mảng đã được sắp xếp
+      + QS là thuật toán sắp xếp tại chỗ
+   - Cài đặt
+   template <typename T>
+   unsigned int partition(T &a, unsigned int lo, unsigned int hi) {
+       auto i = lo;
+       auto j = hi + 1;
+       auto v = a[lo];
+       while (true) {
+           while (a[i++] < a[v]) {
+               if (i == hi) break;
+           }
+           while (a[j--] > a[v]) {
+               if (j == lo) break;
+           }
+           if (i >= j) break;
+           swap(a[i], a[j]);
+       }
+       swap(a[lo], a[j]);
+       return j;
+   }
+   
+   template <typename T>
+   void shuffle(T &a) {
+       for (auto i = 0; i < a.size(); i++) {
+           auto r = i + rand() % (a.size() - i);
+           swap(a[i], a[r]);
+       }
+   }
+   
+   template <typename T>
+   void quick_sort(T &a, unsigned int lo, unsigned int hi) {
+       if (hi <= lo) {
+           return;
+       }
+       auto j = partiton(a, lo, hi);
+       quick_sort(a, lo, j - 1);
+       quick_sort(a, j + 1, hi);
+   }
+   
+   template <typename T>
+   void quick_sort(T &a) {
+       shuffle(a);
+       quick_sort(a, 0, a.size() - 1);
+   }
