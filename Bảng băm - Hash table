@@ -1,0 +1,19 @@
+1. Bảng băm:
+   - Bảng băm là cấu trúc cho phép truy cập dữ liệu bằng chỉ số, nhưng chỉ số được tính toán bằng hàm băm
+   - Hàm băm là cách tính chỉ số của dữ liệu
+      + dữ liệu x, hàm băm h
+      + chỉ số của x sẽ là h(x). T[h(x)] = x.
+   - Có 2 thao tác:
+      + insert(x)
+      + search(T, x, h)
+ 2. Hàm băm module:
+    h(x) = hashcode(x) mod N
+ 3. Giải quyết đụng độ:
+    - Khi 2 dữ liệu x và y cùng băm vào 1 vị trí, tức là
+       i = h(x) = h(y)
+    khi đó, ta sẽ sử dụng danh sách liên kết tại vị trí i để lưu trữ x và y
+    -> Bảng băm là mảng các danh sách liên kết
+    - Đánh giá xích ngăn cách:
+       + Trung bình mất O(1) cho tìm kiếm, chèn, xóa
+       + Trường hợp xấu nhất O(M) (M là số phần tử) khi được băm vào cùng 1 vị trí
+     
