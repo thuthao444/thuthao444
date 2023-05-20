@@ -1,0 +1,114 @@
+1. Đồ thị vô hướng:
+   - Đồ thị là 1 cặp 2 tập hợp <V, E> với V là tập các đỉnh còn E là tập các cạnh nối các đỉnh với nhau sao cho (u, v) thuộc E 
+   thì (v, u) cũng thuộc E.
+   - Cài đặt: vector<vector<int>> adj;
+   
+   class Graph {
+   private:
+       int N, M; // Lưu trữ số đỉnh và số cạnh
+       vector<vector<int>> adj; // Danh sách kề
+   public:
+       Graph(int N_); 
+       void addEdge(int v, int w);
+       const vector<int> &adjacent(int v) const;
+       int V() const;
+       int E() const;
+   };
+   
+   // Hàm tạo của lớp đồ thị, khởi tạo đồ thị với N đỉnh và M = 0 cạnh, cấp phát bộ nhớ cho adj với kích thước N_
+   Graph::Graph(int N_) : N(N_), M(0) {
+       adj.resize(N);
+   }
+   
+   // Thêm một cạnh v - w vào đồ thị
+   void Graph::addEdge(int v, int w) {
+       adj[v].push_back(w);
+       adj[w].push_back(v);
+       M += 1;
+   }
+   
+   // Trả về một tham chiếu đến danh sách kề của đỉnh v trong đồ thị
+   const vector<int> &Graph::adjacent(int v) const {
+       return adj[v];
+   }
+   
+   // Trả về số đỉnh của đồ thị
+   int Graph::V() const {
+       return N;
+   }
+   
+   // Trả về số cạnh của đồ thị
+   int Graph::E() const {
+       return M;
+   }
+ 2. Duyệt đồ thị:
+   - Duyệt theo chiều sâu (DFS):
+      + Ý tưởng:
+         +) Bắt đầu từ đỉnh s
+         +) Đánh dấu và đưa s vào tập S (stack) và lặp:
+            -> Lấy ra đỉnh v sâu nhất trong S (đỉnh được đưa vào cuối cùng)
+            -> Đưa các đỉnh kề với v mà chưa được đánh dấu vào S và đánh dấu các đỉnh này
+      + Độ phức tạp: O(M + N)
+      + Cài đặt:
+      void DepthFirstSearch(const Graph &G, int v) {
+          stack<int> stack;
+          stack.push(v);
+          marked[v] = true;
+          count += 1;
+          while (!stack.empty()) {
+              int w = stack.top();
+              stack.pop();
+              for (const auto &x : G.adjacent(w)) {
+                  if (!marked[x]) {
+                      edgeTo[x] = w;
+                      marked[x] = true;
+                      count += 1;
+                      stack.push(x);
+                  }
+              }
+          }
+      }
+   - Duyệt theo chiều rộng (BFS):
+      + Ý tưởng:
+         +) Bắt đầu từ đỉnh s
+         +) Đánh dấu và đưa s vào tập Q (queue) và lặp:
+            -> Lấy ra đỉnh v nông nhất trong S (đỉnh được đưa vào đầu tiên)
+            -> Đưa các đỉnh kề với v mà chưa được đánh dấu vào S và đánh dấu các đỉnh này
+      + Độ phức tạp: O(M + N)
+      + Cài đặt:
+      void BreadthFirstSearch(const Graph &G, int v) {
+          queue<int> queue;
+          queue.push(v);
+          marked[v] = true;
+          count += 1;
+          while (!queue.empty()) {
+              int w = queue.front();
+              queue.pop();
+              for (const auto &x : G.adjacent(w)) {
+                  if (!marked[x]) {
+                      edgeTo[x] = w;
+                      distTo[x] = distTo[w] + 1;
+                      marked[x] = true;
+                      count += 1;
+                      queue.push(x);
+                  }
+              }
+          }
+      }
+ 3. Thành phần liên thông:
+    - Tính liên thông chia tập đỉnh thành các thành phần liên thông: 2 đỉnh thuộc 1 thành phần liên thông sẽ có đường đi đến nhau,
+    2 đỉnh thuộc 2 thành phần liên thông khác nhau sẽ không có đường đi đến nhau.
+    - Do DFS(s) và BFS(s) duyệt qua tất cả các đỉnh có đường đi đến s nên chỉ cần chạy DFS(s) hoặc BFS(s) lần lượt tất cả các đỉnh trong V (đỉnh s 
+    nào đã xuất hiện trong 1 thành phần liên thông thì không cần gọi DFS(s) nữa).
+    - Mỗi lần gọi DFS(s) ta tăng số thành phần liên thông lên một.
+ 4. Cây: là đồ thị liên thông không có chu trình
+    - Duyệt cây bằng BFS: gọi BFS(r) với r được chọn là đỉnh gốc của cây, lần lượt đánh dấu các đỉnh khác theo khoảng cách lớn dần tính từ gốc r. 
+    Độ dài đường đi từ r đến đỉnh lá l (được gọi BFS(l) cuối cùng) là chiều cao của cây.
+    - Duyệt cây bằng DFS sẽ tạo ra các thứ tự:
+       + Tiền thứ tự (pre-order): thứ tự các đỉnh theo thời điểm bắt đầu gọi DFS
+       + Hậu thứ tự (post-order): thứ tự các đỉnh theo thời điển kết thúc lời gọi DFS
+       + Trung thứ tự (in order): đối với cây nhị phân, với mọi đỉnh v thuộc V, mọi đỉnh thuộc cây bên trái v sẽ được xếp trước, sau đó đến v rồi 
+       đến tất cả các đỉnh thuộc cây bên phải v
+    
+         
+            
