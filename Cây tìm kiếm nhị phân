@@ -1,0 +1,167 @@
+1. Cây tìm kiếm nhị phân:
+   - Cây tìm kiếm nhị phân là cây nhị phân mà mỗi khóa thỏa mãn:
+      + lớn hơn các khóa trong của cây con bên trái
+      + nhỏ hơn các khóa trong của cây con bên phải
+   - Cài đặt: Để biểu diễn một khóa của cây, ta dùng các trường sau:
+      + Trường khóa dữ liệu (key)
+      + Trường giá trị dữ liệu (value)
+      + Trường con trỏ trỏ đến cây con bên trái (left)
+      + Trường con trỏ trỏ đến cây con bên phải (right)
+   template <typename K, typename V>
+   class BinarySearchTree {
+       struct Node {
+           K key;
+           V value;
+           Node *left;
+           Node *right;
+           Node(const K& key_, const V &value) : key(key_), value(value_), left(nullptr), right(nullptr) {}
+       };
+       Node *root;
+   public:
+       BinarySearchTree();
+       void put(const K& key, const V& value);
+       const V& get(const K& key) const;
+       void remove(const K& key);
+       void print() const;
+   private:
+       Node* put(Node *p, const K& key, const V& value);
+   };
+2. Các thao tác trên cây tìm kiếm nhị phân:
+   - Khởi tạo cây: Chỉ cần cho root = nullptr
+   template <typename K, typename V>
+   BinarySearchTree<K, V>::BinarySearchTree() : root(nullptr) {}
+   - Tìm kiếm:
+      + Ý tưởng: bắt đầu từ nút gốc và khóa K cần tìm
+         -> Nếu giá trị của khóa hiện tại bằng với khóa K, trả về giá trị của khóa đó
+         -> Nếu khóa K nhỏ hơn, di chuyển đến nút con bên trái
+         -> Nếu khóa K lớn hơn, di chuyển đến nút con bên phải
+         -> Nếu khóa hiện tại là nullptr, kết thúc tìm kiếm và thông báo không tìm thấy K.
+      + Cài đặt:
+      template <typename K, typename V>
+      const V& BinarySearchTree<K, V>::get(const K& key) const {
+          Node *p = root;
+          while (p != nullptr) {
+              if (key < p->key) {
+                  p = p->left;
+              } else if (key > p->key) {
+                  p = p->right;
+              } else {
+                  return p->value;
+              }
+          throw runtime_error("key not found");
+      }
+   - Thêm cặp K-V vào cây:
+      + Ý tưởng:
+         -> Nếu đã có khóa K trong cây, sửa giá trị cho phù hợp
+         -> Nếu chưa có khóa K trong cây, thêm nút lá mới cho cây với khóa và giá trị tương ứng
+      + Cài đặt: cho con trỏ p đại diện cho nút hiện tại trong cây, khóa key và giá trị value cần thêm
+         -> Nếu p = nullptr tức đã đến nút lá, ta tạo một nút mới với khóa key và giá trị value và thêm vào cây
+         -> Nếu key < p.key ta gọi đệ quy với cây bên trái để tìm khóa key
+         -> Nếu key > p.key ta gọi đệ quy với cây bên phải để tìm khóa key
+         -> key = p.key tức đã tìm thấy khóa key, ta cập nhật giá trị của khóa này bằng value
+      template <typename K, typename V>
+      void BinarySearchTree<K, V>::put(const K& key, const V& value) {
+          root = put(root, key, value);
+      }
+      
+      template <typename K, typename V>
+      typename BinarySearchTree<K, V>::Node* BinarySearchTree<K, V>::put(Node *p, const K& ket, const V& value) {
+          if (p == nullptr) {
+              return new Node(key, value);
+          }
+          if (key < p->key) {
+              p->left = put(p->left, key, value);
+          } else if (key > p->key) {
+              p->right = put(p->right, key, value);
+          } else {
+              p->value = value;
+          }
+          p->size = 1 + size(p->left) + size(p->right);
+          return p;
+      }
+   - Tìm min, max, floor, ceil:
+      +) min(k): nếu p->left khác nullptr, đệ quy min(p->left). nếu p->left = nullptr, trả về p
+      template <typename K, typename V>
+      const V& BinarySearchTree<K, V>::min() const {
+          Node* min_ele = min(root);
+          if (min_ele == nullptr) {
+              throw runtime_error("empty tree");
+          }
+          return min_ele->value;
+      }
+      
+      template <typename K, typename V>
+      typename BinarySearchTree<K, V>::Node* BinarySearchTree<K, V>::min(Node* p) const {
+          if (p == nullptr) {
+              return nullptr;
+          }
+          if (p->left == nullptr) {
+              return p;
+          }
+          return min(p->left);
+      }
+      +) max(k): nếu p->right khác nullptr thì đệ quy max(p->right). nếu p->right = nullptr thì trả về p
+      template <typename K, typename V>
+      const V& BinarySearchTree<K, V>::max() const {
+          Node* max_ele = max(root);
+          if (max_ele == nullptr) {
+              throw runtime_error("empty tree");
+          }
+          return max_ele->value;
+      }
+      
+      template <typename K, typename V>
+      typename BinarySearchTree<K, V>::Node* BinarySearchTree<K, V>::max(Node* p) const {
+          if (p == nullptr) {
+              return nullptr;
+          }
+          if (p->right == nullptr) {
+              return p;
+          }
+          return max(p->right);
+      }
+      +) floor(p, k) - tìm khóa lớn nhất mà không lớn hơn khóa k:
+      +) ceil
+   - rank, select
+3. Duyệt trung thứ tự (in-order):
+   - Cho phép liệt kê các nút theo thứ tự tăng dần của khóa:
+      + Duyệt cây bên trái
+      + Thêm nút gốc vào hàng đợi
+      + Duyệt cây bên phải
+   - Đánh giá: Mất O(N) để sắp xếp các nút tăng dần của khóa.
+   - Cài đặt:
+   template <typename K, typename V>
+   queue<const K&> BinarySearchTree<K, V>::keys() const {
+       queue<const K&> q;
+       keys(root, q);
+       return q;
+   }
+   
+   template <typename K, typename V>
+   void BinarySearchTree<K, V>::keys(Node *p, queue<const K&> &q) const {
+       // duyệt toàn bộ các nút, ta thoát khỏi vòng lặp
+       if (p == nullptr) {
+           return;
+       }
+       keys(p->left, q); // Duyệt cây bên trái
+       q.push(p->key); // Thêm gốc vào hàng đợi
+       keys(p->right, q); // Duyệt cây bên phải
+   }
+4. Xóa nút:
+   - Cách 1: Đánh dấu xóa, giữ lại được khóa để tìm kiếm nhưng không giải phóng được bộ nhớ, kích thước cây luôn 
+   bằng số lượng khóa đã được thêm vào
+   - Cách 2: Gọi q là cha của p, p là nút cần xóa:
+      + Trường hợp 1: p không có nút con, chỉ cần cho link của q đến p bằng nullptr
+      + Trường hợp 2: p có 1 nút con, chỉ cần cho link của q đến p bằng nút con đó
+      + Trường hợp 3: p có 2 nút con
+         -> Tìm x = min(p->right) vì x sẽ lớn hơn tất cả các nút trong p->left và nhỏ hơn p->right
+         -> cho link của q đến p bằng x
+         -> xóa nút x trong cây p->right
+         -> x->left = p->left và x->right bằng cây bên phải sau khi xóa x
+           
+           
+          
+      
+         
+           
+       
