@@ -1,0 +1,313 @@
+1. Cây bao trùm:
+   - Cây bao trùm T của đồ thị vô hướng có trọng số G thỏa mãn:
+      + Là đồ thị con của G. T là cây
+      + chứa mọi đỉnh của đồ thị
+   - Đồ thị vô hướng có trọng số: Khi cài đặt đồ thị vô hướng có trọng số, ta cài đặt danh sách kề thành danh sách kề
+   của đỉnh với các cạnh. Các cạnh là cấu trúc gồm 2 đầu và trọng số.
+   - Cài đặt:
+   class Edge {
+       int v;
+       int w;
+       double weight;
+   public:
+       Edge(int v, int w, double weight) : v(v), w(w), weight(weight) {}
+       int either() const { // Trả về đỉnh bất kì của cạnh
+           return v;
+       }
+       int other (int vertex) { // Trả về đỉnh còn lại của cạnh
+           returnn vertex;
+       }
+       double getWeight() const { // Trả về trọng số của cạnh
+           return weight;
+       }
+       bool operator<(const Edge& that) const {
+           return weight < that.weight;
+       }
+       bool operator>(const Edge& that) const {
+           return weight > that.weight;
+       }
+       bool operator==(const Edge& that) const {
+           return weight == that.weight;
+       }
+       bool operator<=(const Edge& that) const {
+           return weight <= that.weight;
+       }
+       bool operator>=(const Edge& that) const {
+           return weight >= that.weight;
+       }
+   };
+   
+   class EdgeWeightedGraph {
+       int V, E;
+       vector<vector<Edge>> adj;
+   public:
+       EdgeWeightedGraph(int V) : V(V), E(0), adj(V) {}
+       int getV() const {
+           return V;
+       }
+       int getE() const {
+           return E;
+       }
+       void addEdge(const Edge& e) {
+           int v = e.either;
+           int w = e.other(v);
+           adj[v].push_back(e);
+           adj[w].push_back(e);
+           E++;
+       }
+       // Trả về danh sách cạnh kề của một đỉnh đã cho
+       const vector<Edge>& getAdj(int v) const {
+           return adj[v];
+       }
+       // Trả về một vector chứa tất cả các cạnh của đồ thị, không trùng lặp và có đỉnh đầu nhỏ hơn đỉnh cuối
+       vector<Edge> edges() const {
+           vector<Edge> edges;
+           for (int v = 0; v < V; v++) {
+               for (const Edge& e : adj[v]) {
+                   if (e.other(v) > v) {
+                       edges.push_back(e);
+                   }
+               }
+           }
+           return edges;
+       }
+   };
+   2. Tìm cây bao trùm nhỏ nhất (Minimun Spanning Tree):
+      - Cạnh vượt là cạnh có 2 đầu thuộc 2 phần của 1 lát cắt.
+      - Cây bao trùm nhỏ nhất sẽ chứa tất cả các cạnh vượt nhỏ nhất của mọi lát cắt.
+      - Thuật toán Kruskal:
+         +) Ý tưởng:
+            + Bắt đầu từ cây T rỗng, không chứa cạnh nào
+            + Bổ sung lần lượt vào T cạnh nhỏ nhất trong tất cả các cạnh còn lại của đồ thị mà không tạo thành chu trình
+            + Dừng khi đủ N - 1 cạnh
+         +) Cài đặt:
+            + Sử dụng hàng đợi ưu tiên để lấy ra cạnh nhỏ nhất
+            + Sử dụng Union-Find để kiểm tra nhanh một cạnh có tạo chu trình
+            class MinimumSpanningTree {
+                const EdgeWeightedGraph& G;
+                queue<Edge> mst; // Chứa các cạnh của mst
+            public:
+                MinimumSpanningTree(const EdgeWeightedGraph& G_) : G(G_) {
+                    priority_queue<Edge> pq; // Lưu trữ các cạnh theo thứ tự tăng dần của trọng số
+                    // Duyệt qua tất cả cạnh kề của các đỉnh, thêm vào hàng đợi không có sự trùng lặp
+                    for (int v = 0; v < G.getV(); v++) {
+                        for (const Edge& e : G.getAdj(v)) {
+                            if (e.other(v) > v) {
+                                pq.push(e);
+                            }
+                        }
+                    }
+                    
+                    WeightedQuickUnionWithPathCompression uf(G.getV()); // Khởi tạo một cấu trúc union-find
+                    while (!pq.empty() && mst.size() < G.getV() - 1) {
+                        Edge e = pq.top(); // Lấy ra cạnh e nhỏ nhất
+                        pq.pop();
+                        int v = e.either;
+                        int w = e.other(v);
+                        if (!uf.connected(v, w)) {
+                            uf.link(v, w);
+                            mst.push(e);
+                        }
+                    }
+                }
+                
+                queue<Edge> edges() const {
+                    return mst;
+                }
+            };
+         +) Đánh giá
+            + Bất biến:
+               -> T luôn không có chu trình, các cạnh đã duyệt hoặc nằm trong T hoặc tạo chu trình với T. Các cạnh chưa duyệt
+               có độ dài luôn lớn hơn hoặc bằng các cạnh đã duyệt
+            + Thời gian chạy:
+               -> Dùng cấu trúc heap mất O(logM) cho thao tác tìm cạnh nhỏ nhất
+               -> Mất O(logN) cho union-find để kiểm tra và link 2 đỉnh
+               -> Có M cạnh cần duyệt
+               => Độ phức tạp: O(MlogM)
+      - Thuật toán Prim:
+         +) Ý tưởng:
+            + Xuất phát từ cây T rỗng, chọn một đỉnh v1 xuất phát
+            + Lần lượt bổ sung vào T cạnh nhỏ nhất có 1 đỉnh trong T, 1 đỉnh ngoài T
+            + Dừng khi đủ N - 1 cạnh
+         +) Cài đặt:
+            + Cách 1: Sử dụng hàng đợi ưu tiên lưu các cạnh có ít nhất một đỉnh trong T
+               -> Khởi tạo: Chọn 1 đỉnh, đánh dấu đỉnh có trong T và đưa các cạnh kề vào hàng đợi ưu tiên và lặp:
+                  - lấy ra 1 cạnh e = (u, v), nếu 2 đỉnh nằm trong T (loại bỏ)
+                  - Nếu chỉ có 1 đỉnh trong T, ta đánh dấu đỉnh ngoài T là w:
+                     + Đưa các cạnh kề w vào hàng đợi
+                     + Đưa e vào T, đánh dấu w có trong T
+            + Cách 2: Sử dụng hàng đợi ưu tiên lưu trữ các đỉnh với độ ưu tiên là độ dài cạnh ngắn nhất nối với các đỉnh đó
+         +) Đánh giá:
+            + Bất biến: T luôn là cây
+            + Độ phức tạp:
+               -> Cách 1: O(MlogM)
+               -> Cách 1: O(MlogN)
+3. Đồ thị có hướng có trọng số:
+   - Đồ thị có hướng có trọng số: Cài đặt giống đồ thị vô hướng có trọng số, khác ở addEdge
+   - Cài đặt:
+   class DirectedEdge {
+       int v;
+       int w;
+       double weight;
+   public:
+       DirectedEdge(int v, int w, double weight) : v(v), w(w), weight(weight) {}
+       int from() const {
+           return v;
+       }
+       int to() const {
+           return w;
+       }
+       double getWeight() const {
+           return weight;
+       }
+       bool opertor<(const DirectedEdge& that) const {
+           return weight < that.weight;
+       }
+       bool opertor>(const DirectedEdge& that) const {
+           return weight > that.weight;
+       }
+       bool opertor==(const DirectedEdge& that) const {
+           return weight == that.weight;
+       }
+       bool opertor!=(const DirectedEdge& that) const {
+           return weight != that.weight;
+       }
+       bool opertor<=(const DirectedEdge& that) const {
+           return weight <= that.weight;
+       }
+       bool opertor>=(const DirectedEdge& that) const {
+           return weight >= that.weight;
+       }
+   };
+   
+   class EdgeWeightedDiGraph {
+       int V;
+       int E;
+       vector<vector<DirectedEdge>> adj;
+   public:
+       EdgeWeightDiGraph(int V) : V(V), E(0), adj(V) {}
+       
+       int getV() const {
+           return V;
+       }
+       int getE() const {
+           return E;
+       }
+       
+       void addEdge(const DirectedEdge& e) {
+           int v = e.from();
+           adj[v].push_back(e);
+           E++;
+       }
+       
+       const vector<DirectedEdge>& getAdj(int v) const {
+           return adj[v];
+       }
+       
+       vector<DirectedEdge> edges() const {
+           vector<DirectedEdge> edges;
+           for (int v = 0; v < V; v++) {
+               for (const DirectedEdge& e : adj[v]) {
+                   edges.push_back(e);
+               }
+           }
+           return edges;
+       }
+   };
+       
+4. Thuật toán dijkstra:
+   - Phép nới lỏng: Để giải quyết bài toán, ta gọi:
+      + distTo[v]: Đường đi ngắn nhất trong tất cả các đường đi đã biết từ s->v
+      + edgeTo[v]: cạnh kề với v trong đường đi ngắn nhất
+   -> Phép nới lỏng: xét cạnh e = (v,w). Nếu distTo[v] + u(e) < distTo[w] thì:
+      + distTo[w] = distTo[v] + u(e)
+      + edgeTo[w] = e
+   - Thuật toán dijkstra:
+      + Ý tưởng: với mỗi đỉnh v có distTo[v] nhỏ nhất, ta nới lỏng tất cả các cạnh kề của v
+      + Cài đặt: Sử dụng hàng đợi ưu tiên để lưu đường đi ngắn nhất đã biết tới các đỉnh
+         1. visited = rỗng
+         2. distTo[s] = 0, distTo[v] = vô cùng
+         3. v = argmindistTo[v]
+         4. relax all adjacent of v
+         5. visited[v]v = true
+         class DijkstraSP {
+             const EdgeWeightedDigraph& G;
+             int s;
+             vector<double> distTo;
+             vector<DirectesEdge> edgeTo;
+             vector<bool> marked;
+             priority_queue<pair<double, int>> pq;
+         public: 
+             DijkstraSP(const EdgeWeightedDigraph& G_, int s_) : G(G_), s(s_), distTo(G.getV(), numeric_limits<double>::max()), edgeTo(G.getV()), marked(G.getV(), false) {
+                 distTo[s] = 0.0;
+                 pq.push(make_pair(0.0, s));
+                 while (!pq.empty()) {
+                     int v = pq.top().second;
+                     pq.pop();
+                     if (marked[v]) continue;
+                     marked[v] = true;
+                     for (const DirectedEdge& e : G.getAdj(v)) {
+                         relax(e);
+                     }
+                 }
+             }
+             
+             void relax(const DirectedEdge& e) {
+                 int v = e.from();
+                 int w = e.to();
+                 if (distTo[w] > distTo[v] + e.getWeight() && !marked[w]) {
+                     distTo[w] = distTo[v] + e.getWeight();
+                     edgeTo[w] = e;
+                     pq.push(make_pair(-distTo[w], w));
+                 }
+             }
+             
+             double distTo(int v) const { return distTo[v]; }
+             bool hasPathTo(int v) const { return distTo[v] < std::numeric_limits<double>::max(); }
+             vector<DirectedEdge> pathTo(int v) const {
+                 vector<DirectedEdge> path;
+                 if (!hasPathTo(v)) {
+                     return path;
+                 }
+                 for (DirectedEdge e = edgeTo[v]; e.from() != s; e = edgeTo[e.from()]) {
+                     path.push_back(e);
+                 }
+                 reverse(path.begin(), path.end());
+                 return path;
+            }
+        };
+      + Đánh giá:
+         +) Bất biến: 
+            -> Đỉnh v đã được duyệt thì distTo[v] không thay đổi nữa
+            -> Khi nới lỏng cạnh e = (v, w) thì từ đó về sau distTo[w] <= distTo[v] + u(e) vì distTo[w] luôn giảm còn 
+            distTo[v] thì không thay đổi nữa
+            -> Khi kết thúc thuật toán, mọi cạnh e = (v, w) đều có distTo[w] <= distTo[v] + u(e)
+         +) Độ phức tạp: O(ElogV) do sử dụng hàng đợi ưu tiên và cấu trúc heap, bộ nhớ cần O(V) do cấu trúc heap
+5. Tìm đường đi ngắn nhất sử dụng sắp xếp to-po: Áp dụng cho đồ thị có hướng không có chu trình:
+   - ý tưởng:
+      + sắp xếp các đỉnh theo sắp xếp to-po: v1,v2,...,vn
+      + for i = s,..,vn
+      + relax all edge adjacent to v
+      (các đỉnh trước s trong thứ tự topo không cần duyệt vì không có đường đi đến s)
+   - Nhận xét:
+      + không có đường đi đến các đỉnh trước s
+      + khi đỉnh v được duyệt thì distTo[v] không thay đổi nữa
+   - Thời gian chạy: O(V + E)
+6. Thuật toán Bellman - ford:
+   - Phương trình bellman: distTo[w] = distTo[v] + u(e)
+   - Ý tưởng:
+      + Nếu đồ thị không có chu trình âm thì đường đi ngắn nhất N - 1
+      + Thực hiện nới lỏng các cạnh nhiều lần nhưng không quá N
+   - Cài đặt:
+      + B1: Khởi tạo distTo[s] = 0, distTo[v] = vô cùng
+      + B2: Lặp lại các bước sau cho đến khi không có sự thay đổi nữa:
+         -> Nới lỏng tất cả các cạnh (u, v) của đỉnh u đã được lưu từ lần lặp trước
+         -> Lưu lại đỉnh cuối v của mỗi cạnh được nới lỏng
+      + B3: Kiểm tra chu trình âm: duyệt thêm 1 lần, nếu có sự thay đổi, tức là có chu trình âm. Để tìm chu trình âm, ta sử dụng DFS
+      trên các cạnh của edgeTo[v]
+      + B4: Nếu không có chu trình âm, ta đã tìm được đường đi ngắn nhất
+   - Thời gian chạy: O(NM)
+       
+               
+       
+   
