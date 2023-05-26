@@ -1,0 +1,12 @@
+1. Chia để trị:
+- Ý tưởng:
+   + Chia bài toán lớn thành nhiều phần nhỏ hơn
+   + Giải các bài toán nhỏ
+   + Tổng hợp kết quả để tạo lời giải của bài toán lớn
+- Tìm kiếm nhị phân
+- Merge Sort 
+- Quick Sort
+- Cây tìm kiếm
+2. Quy hoạch động:
+- Thể hiện cấu trúc của lời giải
+- Ví dụ: Phương trình bellman: distTo[w] = distTo[v] + u(e)
